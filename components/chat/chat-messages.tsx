@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, type FormEvent } from "react";
-import { useLiveQuery } from "@tanstack/react-db";
+import { eq, useLiveQuery } from "@tanstack/react-db";
 import { chatMessagesCollection, type ChatMessage } from "@/lib/collections";
 import { useChatContext } from "./chat-context";
 
@@ -12,10 +12,9 @@ export function ChatMessages() {
   const [editContent, setEditContent] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { data: allMessages, collection, isLoading } = useLiveQuery(chatMessagesCollection);
-
-  // Filter messages for current thread
-  const messages = allMessages?.filter((m) => m.threadId === threadId) ?? [];
+  const { data: messages, isLoading } = useLiveQuery(
+    q => q.from({cm:chatMessagesCollection}).where(({cm}) => eq(cm.threadId, threadId))
+  );
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -26,9 +25,9 @@ export function ChatMessages() {
     e.preventDefault();
     if (!newMessage.trim() || !userName || !threadId) return;
 
-    const maxId = allMessages?.reduce((max, m) => Math.max(max, m.id), 0) ?? 0;
+    const maxId = messages?.reduce((max, m) => Math.max(max, m.id), 0) ?? 0;
 
-    collection.insert({
+    chatMessagesCollection.insert({
       id: maxId + 1,
       senderName: userName,
       messageContent: newMessage.trim(),
@@ -50,7 +49,7 @@ export function ChatMessages() {
   const handleSaveEdit = async (id: number) => {
     if (!editContent.trim()) return;
 
-    collection.update(id, (draft) => {
+    chatMessagesCollection.update(id, (draft) => {
       draft.messageContent = editContent.trim();
       draft.isEdited = true;
     });
@@ -65,11 +64,11 @@ export function ChatMessages() {
   };
 
   const handleDeleteMessage = async (id: number) => {
-    collection.delete(id);
+    chatMessagesCollection.delete(id);
   };
 
   const handleTogglePin = async (msg: ChatMessage) => {
-    collection.update(msg.id, (draft) => {
+    chatMessagesCollection.update(msg.id, (draft) => {
       draft.isPinned = !draft.isPinned;
     });
   };

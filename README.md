@@ -12,8 +12,27 @@ I'm using this repository to experiment with tanstack db and electric sql in Nex
 
 ## Some issues i ran into:
 
-1. Using `syncMode: "on-demand"` is not properly working?
-2. Using ngrok with bun, it doesnt work well. But with node, it works fine
+1. ~~Using `syncMode: "on-demand"` is not properly working~~ 
+
+Solution:
+It does work but the setup must be with query:
+```ts
+✅
+const { data: messages, isLoading } = useLiveQuery(
+  q => q.from({cm:chatMessagesCollection})
+);
+```
+not with: 
+```ts
+❌
+const { data: messages, isLoading } = useLiveQuery(chatMessagesCollection)
+```
+2. Using ngrok with bun runtime doesnt work well, but works fine with node runtime
+
+Try it out:
+- `bun run --bun next dev` to run in bun environment
+- `bun run next dev` to run in node environment
+then do `ngrok http 3000` 
 
 ## What i did starting from nothing:
 

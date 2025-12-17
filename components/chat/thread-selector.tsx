@@ -1,14 +1,17 @@
 "use client";
 
 import { useMemo, type FormEvent } from "react";
-import { useLiveQuery } from "@tanstack/react-db";
+import { gt, useLiveQuery } from "@tanstack/react-db";
 import { chatMessagesCollection, type ChatMessage } from "@/lib/collections";
 import { useChatContext } from "./chat-context";
 
 export function ThreadSelector() {
   const { userName, setThreadId, resetChat } = useChatContext();
-  
-  const { data: messages, isLoading } = useLiveQuery(chatMessagesCollection)
+
+  const { data: messages, isLoading } = useLiveQuery(
+    // chatMessagesCollection
+    q => q.from({cm:chatMessagesCollection})
+  );
 
   // Group messages by threadId to get unique threads
   const threads = useMemo(() => {
