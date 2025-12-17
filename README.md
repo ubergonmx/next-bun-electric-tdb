@@ -1,13 +1,15 @@
-Using Next.js + Bun + Tanstack DB + Electric SQL
+# Using Next.js + Bun + Tanstack DB + Electric SQL
 
 I'm using this repository to experiment with tanstack db and electric sql in Next. Also, find weird interactions and bugs.
+
+You can clone this repo and try it out.
 
 ## How to run
 
 1. `bun i`
 2. `docker compose up` and rename .example.env to .env
 3. `bun db:migrate`
-4. `bun dev` or `bun run --bun next dev` to run in bun or do `bun run next dev` to run in node
+4. `bun dev` to run in bun runtime or do `bun run next dev` to run in node
 
 
 ## Some issues i ran into:
@@ -32,7 +34,8 @@ const { data: messages, isLoading } = useLiveQuery(chatMessagesCollection)
 Try it out:
 - `bun run --bun next dev` to run in bun environment
 - `bun run next dev` to run in node environment
-then do `ngrok http 3000` 
+
+then do `ngrok http 3000` , switch between the commands and check Network requests
 
 ## What i did starting from nothing:
 
@@ -56,7 +59,7 @@ bun i drizzle-orm drizzle-kit drizzle-zod postgres @tanstack/react-db @tanstack/
 - added packagage.json scripts for drizzle
 
 4. Setup tanstack db collection, actions, API and UI components:
-- [electric sql API](/app/api/messages/route.ts) - GET request
+- [app/api/messages/route.ts](/app/api/messages/route.ts) - proxy for electric sql
 - [lib/actions.ts](./lib/actions.ts) - create,update,delete chat messages
 - [lib/collections.ts](./lib/collections.ts) - tanstackdb collection w/ electricsql
 - [components/client-only.tsx](./components/client-only.tsx) - wrapped children in layout for tanstack db
@@ -71,4 +74,4 @@ bun i drizzle-orm drizzle-kit drizzle-zod postgres @tanstack/react-db @tanstack/
 },
 ```
 
-6. Now we can run `bun dev` in bun environment`
+6. Now we can run `bun dev` in bun runtime

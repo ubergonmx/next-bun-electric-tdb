@@ -42,16 +42,26 @@ export const chatMessagesInsertSchema = createInsertSchema(chatMessages).omit({
   createdAt: true,
   updatedAt: true,
 });
-export const chatMessagesSelectSchema = createSelectSchema(chatMessages).omit({
-  uid: true,
-  createdAt: true,
-  updatedAt: true,
-});
-export const chatMessagesUpdateSchema = createUpdateSchema(chatMessages).omit({
-  uid: true,
-  createdAt: true,
-  updatedAt: true,
-});
+export const chatMessagesSelectSchema = createSelectSchema(chatMessages)
+  .omit({
+    uid: true,
+    createdAt: true,
+    updatedAt: true,
+  })
+  .extend({
+    // Coerce timestamp strings from database to Date objects
+    readAt: z.coerce.date().nullable(),
+  });
+export const chatMessagesUpdateSchema = createUpdateSchema(chatMessages)
+  .omit({
+    uid: true,
+    createdAt: true,
+    updatedAt: true,
+  })
+  .extend({
+    // Coerce timestamp strings from database to Date objects
+    readAt: z.coerce.date().nullable().optional(),
+  });
 
 export type ChatMessage = z.infer<typeof chatMessagesSelectSchema>;
 export type CreateChatMessage = z.infer<typeof chatMessagesInsertSchema>;
