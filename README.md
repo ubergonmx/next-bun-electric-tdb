@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Using Next.js + Bun + Tanstack DB + Electric SQL
 
-## Getting Started
+I'm using this repository to experiment with tanstack db and electric sql in Next. Also, find weird interactions and bugs.
 
-First, run the development server:
+## How to run
 
+1. `bun i`
+2. `docker compose up` and rename .example.env to .env
+3. `bun db:migrate`
+4. `bun dev` or `bun run --bun next dev` to run in bun or do `bun run next dev` to run in node
+
+
+## Some issues i ran into:
+
+1. Using `syncMode: "on-demand"` is not properly working?
+2. Using ngrok with bun, it doesnt work well. But with node, it works fine
+
+## What i did starting from nothing:
+
+1. Create next app via bun
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bunx create-next-app@latest
+✔ What is your project named? … next-bun-electric-tdb
+✔ Would you like to use the recommended Next.js defaults? › Yes, use recommended defaults
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install packages
+```bash
+bun i drizzle-orm drizzle-kit drizzle-zod postgres @tanstack/react-db @tanstack/electric-db-collection @electric-sql/client 
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Setup db, check:
+- [compose.yml](./compose.yml) (postgres + electric sql)
+- .example.env 
+- [db/index.ts](./lib/db/index.ts) - db setup + txid function
+- [db/schema.ts](./lib/db/schema.ts) - 1 table (chatMessages)
+- added packagage.json scripts for drizzle
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Setup tanstack db collection, actions, API and UI components:
+- [electric sql API](/app/api/messages/route.ts) - GET request
+- [lib/actions.ts](./lib/actions.ts) - create,update,delete chat messages
+- [lib/collections.ts](./lib/collections.ts) - tanstackdb collection w/ electricsql
+- [components/client-only.tsx](./components/client-only.tsx) - wrapped children in layout for tanstack db
+- [components/chat](./components/chat) - the chat component
 
-## Learn More
+5. Modify package.json scripts to force run bun:
+```json
+"scripts": {
+  "dev": "bun run --bun next dev",
+  "build": "bun run --bun next build",
+  "start": "bun run --bun next start",
+},
+```
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+6. Now we can run `bun dev` in bun environment`

@@ -1,0 +1,42 @@
+services:
+  next-bun-electric-tdb-db:
+    image: postgres:15-alpine
+    restart: always
+    container_name: next-bun-electric-tdb-db
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_DB: next-bun-electric-tdb
+      POSTGRES_USER: next-bun-electric-tdb_user
+      POSTGRES_PASSWORD: local-dev-password
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    tmpfs:
+      - /tmp
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U next-bun-electric-tdb_user -d next-bun-electric-tdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command:
+      - -c
+      - listen_addresses=*
+      - -c
+      - wal_level=logical
+
+  electric:
+    image: electricsql/electric:latest
+    restart: always
+    container_name: next-bun-electric-tdb-electric
+    ports:
+      - "4000:3000"
+    environment:
+      DATABASE_URL: postgresql://next-bun-electric-tdb_user:local-dev-password@next-bun-electric-tdb-db:5432/next-bun-electric-tdb?sslmode=disable
+      ELECTRIC_INSECURE: true
+    depends_on:
+      next-bun-electric-tdb-db:
+        condition: service_healthy
+
+volumes:
+  postgres:
